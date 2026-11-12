@@ -6,7 +6,7 @@
 
 - **Live demo:** https://tanpura.onrender.com (Render free tier: the first load can take about a minute while it wakes up)
 - **Demo login:** shown on the sign-in page (`teacher@tanpura.app`, demo mode). Every sign-in gets its own private copy of the demo data, so visitors never see each other's changes.
-- **Video (under 3 minutes):** _YouTube link goes here_
+- **Video (under 3 minutes):** https://youtu.be/8w9nzlQvqHQ
 
 ## The problem
 
