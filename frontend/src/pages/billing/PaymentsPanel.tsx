@@ -66,7 +66,7 @@ export function PaymentsPanel({ month }: { month: string }) {
                 <StatCard label="PayPal fees" value={formatTotals(report.totals.map((t) => ({ currency: t.currency, amount: t.fee })))} hint="taken by PayPal" />
               </Grid>
               <Grid size={{ xs: 6, md: 4 }}>
-                <StatCard label="You keep" value={formatTotals(report.totals.map((t) => ({ currency: t.currency, amount: t.net })))} tone="success" hint={report.unmatched ? `${plural(report.unmatched, 'payment')} not matched to an invoice` : 'every payment matched'} />
+                <StatCard label="You keep" value={formatTotals(report.totals.map((t) => ({ currency: t.currency, amount: t.net })))} tone="success" hint="from your Tanpura invoices" />
               </Grid>
             </Grid>
           </Stack>

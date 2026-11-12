@@ -72,7 +72,7 @@ export type PaymentsReport = {
   month: string;
   rows: PaymentRow[];
   totals: { currency: Currency; gross: number; fee: number; net: number }[];
-  unmatched: number; // payments that match no invoice
+  unmatched: number; // other payments in the PayPal account, not counted (no Tanpura invoice)
   note?: string;
   // Money received, converted to the teacher's home currency at each payment date's ECB rate.
   home?: { currency: string; gross: number; fee: number; net: number };
