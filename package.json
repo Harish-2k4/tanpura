@@ -1,0 +1,26 @@
+{
+  "name": "tanpura",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n api,web \"npm run dev -w backend\" \"npm run dev -w frontend\"",
+    "build": "npm run build -w frontend",
+    "start": "npm start -w backend",
+    "seed": "npm run seed -w backend",
+    "test": "npm test -w backend",
+    "typecheck": "npm run typecheck -w backend && npm run typecheck -w frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.7",
+    "typescript": "^7.0.2",
+    "@types/node": "^26.6.6"
+  },
+  "engines": {
+    "node": ">=22.12"
+  },
+  "description": "Tanpura: an AI billing assistant that bills every family correctly from the class calendar, through PayPal.",
+  "license": "MIT"
+}

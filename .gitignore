@@ -1,0 +1,27 @@
+# dependencies
+node_modules/
+
+# builds
+dist/
+*.tsbuildinfo
+
+# secrets: only the template is committed
+.env*
+!.env.example
+
+# runtime data (created on first start, rebuilt with npm run seed)
+backend/data/
+*.tmp
+
+# logs and OS files
+npm-debug.log*
+.DS_Store
+*.pem
+
+# private notes (not for the public repo)
+initial_plan.md
+Memory.md
+CLAUDE.md
+
+# private submission notes
+notes/
