@@ -1,0 +1,10 @@
+/* Bryntum's calendar fills its card. */
+.b-calendar {
+  height: 100%;
+}
+
+/* Cancelled classes stay visible but read as cancelled. */
+.tp-cancelled {
+  opacity: 0.6;
+  text-decoration: line-through;
+}
