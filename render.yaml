@@ -1,0 +1,38 @@
+# Render blueprint: one web service that builds the React app and runs the Express API, which
+# also serves the built app. The free plan's disk is temporary, so the demo data is rebuilt
+# around the current date whenever the service starts.
+services:
+  - type: web
+    name: tanpura
+    runtime: node
+    plan: free
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "24"
+      - key: DEMO_MODE
+        value: "true"
+      - key: APP_EMAIL
+        value: teacher@tanpura.app
+      - key: APP_PASSWORD
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_SECRET
+        sync: false
+      - key: PAYPAL_WEBHOOK_ID
+        sync: false
+      - key: DEMO_BUYER_EMAIL
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        sync: false
+      - key: AG_STUDIO_LICENSE
+        sync: false
