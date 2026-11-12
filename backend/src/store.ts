@@ -1,14 +1,17 @@
-// JSON file storage in DATA_DIR (default backend/data). Server-side only.
+// JSON file storage in DATA_DIR (default backend/data), or a demo visitor's copy under it. Server-side only.
 import { access, mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import type { InvoiceRecord, Session, Student } from '../../shared/billing';
 import type { Teacher } from '../../shared/settings';
 import { config } from './config';
+import { currentContext } from './context';
 
 export type Dataset = { teacher: Teacher; students: Student[]; sessions: Session[]; invoices: InvoiceRecord[] };
 
 const NAMES = ['teacher', 'students', 'sessions', 'invoices'] as const;
-const file = (name: (typeof NAMES)[number]) => path.resolve(config.dataDir, `${name}.json`);
+// The request's own data folder (a demo visitor's copy), or the main one.
+export const dataDir = () => path.resolve(currentContext()?.dir ?? config.dataDir);
+const file = (name: (typeof NAMES)[number]) => path.join(dataDir(), `${name}.json`);
 
 async function read<T>(name: (typeof NAMES)[number]): Promise<T> {
   return JSON.parse(await readFile(file(name), 'utf8')) as T;
@@ -37,7 +40,7 @@ export async function loadAll(): Promise<Dataset> {
 }
 
 export async function saveAll(data: Dataset) {
-  await mkdir(path.resolve(config.dataDir), { recursive: true });
+  await mkdir(dataDir(), { recursive: true });
   await Promise.all([saveTeacher(data.teacher), saveStudents(data.students), saveSessions(data.sessions), saveInvoices(data.invoices)]);
 }
 

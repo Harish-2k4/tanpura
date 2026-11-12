@@ -59,7 +59,11 @@ export function useLogin() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (body: { email: string; password: string }) => api<Me>('/auth/login', { method: 'POST', body }),
-    onSuccess: (me) => qc.setQueryData(keys.me, me),
+    // A new sign-in can be a new demo copy: drop anything cached from the last session first.
+    onSuccess: (me) => {
+      qc.removeQueries({ predicate: (q) => q.queryKey[0] !== keys.me[0] });
+      qc.setQueryData(keys.me, me);
+    },
     meta: { silent: true }, // the form shows the error itself
   });
 }

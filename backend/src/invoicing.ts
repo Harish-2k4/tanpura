@@ -5,11 +5,16 @@ import { paypalFeatures } from '../../shared/paypal-features';
 import type { Teacher } from '../../shared/settings';
 import { addDays } from '../../shared/time';
 import { cap, wordsFor } from '../../shared/words';
+import { currentContext, workspaceCode } from './context';
 import * as paypal from './paypal';
 
 // Unique per student, month and attempt (a cancelled invoice can be re-issued). PayPal rejects
 // a duplicate number, which stops a retried request from creating a second invoice.
-export const invoiceNumber = (studentId: string, month: string, attempt: number) => `TP-${studentId}-${month}-${attempt}`;
+// A demo visitor's copy adds its own code, so two copies never share an invoice number.
+export const invoiceNumber = (studentId: string, month: string, attempt: number) => {
+  const ws = currentContext()?.workspace;
+  return `TP-${ws ? `${workspaceCode(ws)}-` : ''}${studentId}-${month}-${attempt}`;
+};
 
 export function toPayPalInvoice(draft: InvoiceDraft, student: Student, teacher: Teacher, number: string, today: string) {
   const w = wordsFor(teacher.profession);

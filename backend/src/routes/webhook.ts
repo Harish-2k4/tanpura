@@ -8,6 +8,7 @@ import { HttpError } from '../http';
 import { mapStatus } from '../invoicing';
 import { verifyWebhookSignature, type PayPalInvoice } from '../paypal';
 import { exclusive, loadAll, saveInvoices } from '../store';
+import { forEachDataCopy } from '../workspaces';
 import { paidMessage } from './billing';
 
 const seen = new Set<string>();
@@ -33,15 +34,18 @@ webhookRouter.post('/', async (req, res) => {
   const invoice = event.resource?.invoice ?? event.resource;
   const status = invoice?.status ? mapStatus(invoice.status) : undefined;
   if (event.event_type.startsWith('INVOICING.INVOICE.') && invoice?.id && status) {
-    await exclusive(async () => {
-      const data = await loadAll();
-      const inv = data.invoices.find((i) => i.id === invoice.id);
-      if (!inv || inv.status === status) return;
-      const paidAt = invoice.payments?.transactions?.map((t) => t.payment_date?.slice(0, 10)).filter(Boolean).sort().at(-1);
-      Object.assign(inv, { status, ...(status === 'PAID' ? { paidAt: paidAt ?? new Date().toISOString().slice(0, 10) } : {}) } satisfies Partial<InvoiceRecord>);
-      await saveInvoices(data.invoices);
-      broadcast({ type: status === 'PAID' ? 'invoice-paid' : 'invoice-updated', invoiceId: inv.id, message: paidMessage(data, inv) });
-    });
+    // The invoice lives in the main data or in one demo visitor's copy.
+    await forEachDataCopy(() =>
+      exclusive(async () => {
+        const data = await loadAll();
+        const inv = data.invoices.find((i) => i.id === invoice.id);
+        if (!inv || inv.status === status) return;
+        const paidAt = invoice.payments?.transactions?.map((t) => t.payment_date?.slice(0, 10)).filter(Boolean).sort().at(-1);
+        Object.assign(inv, { status, ...(status === 'PAID' ? { paidAt: paidAt ?? new Date().toISOString().slice(0, 10) } : {}) } satisfies Partial<InvoiceRecord>);
+        await saveInvoices(data.invoices);
+        broadcast({ type: status === 'PAID' ? 'invoice-paid' : 'invoice-updated', invoiceId: inv.id, message: paidMessage(data, inv) });
+      }),
+    );
   }
   res.json({ ok: true });
 });

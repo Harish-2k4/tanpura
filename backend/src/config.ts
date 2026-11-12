@@ -56,6 +56,8 @@ export const config = {
   },
   // Demo mode shows the login on the sign-in page and allows resetting the demo data.
   demoMode: env.DEMO_MODE ? env.DEMO_MODE === 'true' : !production,
+  // On the public demo (demo mode in production), each sign-in gets a private copy of the data.
+  visitorCopies: production && env.DEMO_MODE === 'true',
   fxEnabled: env.NODE_ENV !== 'test', // tests stay offline
   demoBuyerEmail: env.DEMO_BUYER_EMAIL,
   paypal: env.PAYPAL_CLIENT_ID && env.PAYPAL_SECRET ? { clientId: env.PAYPAL_CLIENT_ID, secret: env.PAYPAL_SECRET } : undefined,
