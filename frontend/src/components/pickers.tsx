@@ -2,7 +2,10 @@
 // months as YYYY-MM, dates as YYYY-MM-DD, date-times as ISO instants.
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import Button from '@mui/material/Button';
+import DialogActions from '@mui/material/DialogActions';
 import type { Dayjs } from 'dayjs';
+import { useRef, useState } from 'react';
 import dayjs from '../lib/dayjs';
 
 const valid = (v: Dayjs | null): v is Dayjs => Boolean(v?.isValid());
@@ -52,7 +55,32 @@ type DateTimeProps = {
   error?: boolean;
 };
 
+// Keep the popup on screen (it moves up on short screens), so OK and Cancel are always visible.
+const ON_SCREEN = { modifiers: [{ name: 'flip', enabled: true }, { name: 'preventOverflow', options: { altAxis: true, padding: 8 } }] };
+
+// Cancel and OK under the picker. OK keeps the day and time picked; Cancel (or Esc) keeps the old value.
+function PickerButtons({ onCancel, onOk, className }: { onCancel?: () => void; onOk?: () => void; className?: string }) {
+  return (
+    <DialogActions className={className} sx={{ gridColumn: '1 / -1', gridRow: 3 }}>
+      <Button onClick={onCancel}>Cancel</Button>
+      <Button onClick={onOk}>OK</Button>
+    </DialogActions>
+  );
+}
+
 export function DateTimeField({ value, onChange, label, timeZone, minutesStep = 15, disablePast, helperText, error }: DateTimeProps) {
+  const committed = value ? dayjs(value).tz(timeZone) : null;
+  const [open, setOpen] = useState(false);
+  const [draft, setDraft] = useState<Dayjs | null>(null); // what is picked while the popup is open
+  // The picker keeps the buttons it was first given, so they read the latest values through refs.
+  const latest = useRef({ draft, onChange });
+  latest.current = { draft, onChange };
+  const close = useRef(() => setOpen(false)).current;
+  const ok = useRef(() => {
+    const { draft: picked, onChange: save } = latest.current;
+    if (valid(picked)) save(picked.toISOString());
+    setOpen(false);
+  }).current;
   return (
     <DateTimePicker
       label={label}
@@ -61,15 +89,20 @@ export function DateTimeField({ value, onChange, label, timeZone, minutesStep = 
       minutesStep={minutesStep}
       disablePast={disablePast}
       format="ddd D MMM YYYY, h:mm a"
-      value={value ? dayjs(value).tz(timeZone) : null}
-      // The value is taken only on OK (or on picking the last part); Cancel or Esc keeps the old one.
-      closeOnSelect={false}
-      onAccept={(v) => onChange(valid(v) ? v.toISOString() : null)}
-      onChange={(v, ctx) => {
-        // Typing in the field still works directly.
-        if (!ctx.validationError && valid(v) && document.activeElement?.closest('.MuiPickersInputBase-root')) onChange(v.toISOString());
+      open={open}
+      onOpen={() => {
+        setDraft(committed);
+        setOpen(true);
       }}
-      slotProps={{ textField: { fullWidth: true, helperText, error }, actionBar: { actions: ['cancel', 'accept'] } }}
+      onClose={close}
+      value={open ? draft : committed}
+      closeOnSelect={false}
+      onChange={(v, ctx) => {
+        if (open) setDraft(v);
+        else if (!ctx.validationError && valid(v)) onChange(v.toISOString()); // typing in the field
+      }}
+      slots={{ actionBar: PickerButtons }}
+      slotProps={{ textField: { fullWidth: true, helperText, error }, actionBar: { onCancel: close, onOk: ok } as object, popper: ON_SCREEN }}
     />
   );
 }
