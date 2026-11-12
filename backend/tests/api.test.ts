@@ -26,6 +26,7 @@ Object.assign(process.env, {
 const { createApp } = await import('../src/app');
 const { generateDemoData } = await import('../src/seed');
 const { saveAll } = await import('../src/store');
+const { config } = await import('../src/config');
 
 let base = '';
 let cookie = '';
@@ -424,6 +425,49 @@ describe('kind of work', () => {
     assert.equal((await call('POST', '/demo/reset')).status, 204);
     assert.equal((await call<TeacherView>('GET', '/teacher')).body.profession, 'client_sessions', 'reset keeps the choice');
   });
+});
+
+describe('public demo: a private copy per visitor', () => {
+  const login = async () => {
+    const res = await call('POST', '/auth/login', { auth: false, body: { email: 'teacher@example.com', password: 'correct horse battery' } });
+    assert.equal(res.status, 200);
+    return res.headers.getSetCookie()[0].split(';')[0];
+  };
+
+  test("one visitor's changes never reach another", async () => {
+    config.visitorCopies = true;
+    try {
+      const [a, b] = [await login(), await login()];
+      assert.notEqual(a, b);
+      // Each copy starts fresh and asks for the kind of work.
+      assert.equal((await call<TeacherView>('GET', '/teacher', { cookie: a })).body.profession, undefined);
+      assert.equal((await call('POST', '/teacher/profession', { cookie: a, body: { profession: 'teaching' } })).status, 200);
+      const today = (await call<TeacherView>('GET', '/teacher', { cookie: a })).body.today;
+      assert.equal((await call('POST', '/students/s01/end', { cookie: a, body: { lastDate: today } })).status, 200);
+      const endedA = (await call<Student[]>('GET', '/students', { cookie: a })).body.find((s) => s.id === 's01');
+      assert.equal(endedA?.endedOn, today);
+
+      const s01 = (await call<Student[]>('GET', '/students', { cookie: b })).body.find((s) => s.id === 's01');
+      assert.equal(s01?.endedOn, undefined, "B's student is untouched");
+      assert.equal((await call<TeacherView>('GET', '/teacher', { cookie: b })).body.profession, undefined);
+
+      // A tampered workspace id fails the signature.
+      const [name, value] = a.split('=');
+      const parts = decodeURIComponent(value).split('.');
+      const forged = `${name}=${[parts[0], 'aaaaaaaaaaaa', parts[2]].join('.')}`;
+      assert.equal((await call('GET', '/teacher', { cookie: forged })).status, 401);
+    } finally {
+      config.visitorCopies = false;
+    }
+  });
+});
+
+test('the AI budget stops a visitor after the hourly limit', async () => {
+  const { spendBudget, resetAiBudget, AiLimitError, AI_LIMITS } = await import('../src/gemini');
+  resetAiBudget();
+  for (let i = 0; i < AI_LIMITS.hour.perVisitor; i++) spendBudget();
+  assert.throws(() => spendBudget(), (e) => e instanceof AiLimitError && e.message === AI_LIMITS.hour.message);
+  resetAiBudget();
 });
 
 test('signing out ends the session', async () => {

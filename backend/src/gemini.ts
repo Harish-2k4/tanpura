@@ -2,6 +2,7 @@
 // again here; a bad or slow answer throws, and callers fall back to their rule-based version.
 // Server-side only.
 import { config } from './config';
+import { currentContext } from './context';
 
 const API = 'https://generativelanguage.googleapis.com/v1beta';
 const TIMEOUT_MS = 25_000;
@@ -10,6 +11,36 @@ const FAST_TIMEOUT_MS = 15_000; // short tasks (reading a message, a reminder): 
 export const geminiEnabled = () => Boolean(config.gemini);
 
 export class AiError extends Error {}
+export class AiLimitError extends AiError {}
+
+// Hourly and daily budgets of Gemini calls, per visitor and in total, so a public demo can't use up
+// the key. Past one, callers fall back to their rule-based version (the dashboard assistant says so).
+export const AI_LIMITS = {
+  hour: { perVisitor: 40, total: 200, message: 'The AI limit for this hour is used up. It resets at the top of the hour.' },
+  day: { perVisitor: 150, total: 600, message: "Today's AI limit for this demo is used up. It resets at midnight UTC." },
+};
+type Window = { key: string; total: number; byVisitor: Map<string, number> };
+const fresh = (): Record<keyof typeof AI_LIMITS, Window> => ({ hour: { key: '', total: 0, byVisitor: new Map() }, day: { key: '', total: 0, byVisitor: new Map() } });
+let budget = fresh();
+
+export function spendBudget() {
+  const now = new Date().toISOString();
+  const keys = { hour: now.slice(0, 13), day: now.slice(0, 10) };
+  const visitor = currentContext()?.visitor ?? 'server';
+  for (const name of ['hour', 'day'] as const) {
+    const w = budget[name];
+    if (w.key !== keys[name]) budget[name] = { key: keys[name], total: 0, byVisitor: new Map() };
+    const { total, byVisitor } = budget[name];
+    const limit = AI_LIMITS[name];
+    if (total >= limit.total || (byVisitor.get(visitor) ?? 0) >= limit.perVisitor) throw new AiLimitError(limit.message);
+  }
+  for (const name of ['hour', 'day'] as const) {
+    const w = budget[name];
+    w.total++;
+    w.byVisitor.set(visitor, (w.byVisitor.get(visitor) ?? 0) + 1);
+  }
+}
+export const resetAiBudget = () => (budget = fresh());
 
 // Gemini's response schema format (an OpenAPI subset).
 export type GeminiSchema = {
@@ -78,6 +109,7 @@ async function postOnce(apiKey: string, model: string, body: unknown, timeoutMs:
 
 async function post(apiKey: string, body: unknown, timeoutMs: number): Promise<{ model: string; res: Response }> {
   if (!config.gemini) throw new AiError('Gemini is not configured');
+  spendBudget();
   let models = await chooseModels(apiKey, config.gemini.model);
   if (preferred && Date.now() < preferred.until && models.includes(preferred.model)) models = [preferred.model, ...models.filter((m) => m !== preferred!.model)];
   const problems: string[] = [];

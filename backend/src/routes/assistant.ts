@@ -4,7 +4,7 @@ import { assistantApplySchema, assistantMessageSchema, type ApplyResult } from '
 import { applyActions, proposeFromMessage } from '../ai/assistant';
 import { runStudioTurn, studioTurnSchema } from '../ai/studio';
 import { config } from '../config';
-import { geminiEnabled } from '../gemini';
+import { AiLimitError, geminiEnabled } from '../gemini';
 import { HttpError, parse } from '../http';
 import { exclusive, loadAll, saveSessions } from '../store';
 
@@ -32,5 +32,11 @@ assistantRouter.post('/apply', async (req, res) => {
 // One turn of AG Studio's dashboard assistant, answered by Gemini.
 assistantRouter.post('/studio', aiLimiter, async (req, res) => {
   if (!geminiEnabled()) throw new HttpError(503, 'The dashboard assistant needs a Gemini key');
-  res.json(await runStudioTurn(parse(studioTurnSchema, req.body)));
+  const turn = parse(studioTurnSchema, req.body);
+  try {
+    res.json(await runStudioTurn(turn));
+  } catch (e) {
+    if (e instanceof AiLimitError) throw new HttpError(429, e.message);
+    throw e;
+  }
 });
