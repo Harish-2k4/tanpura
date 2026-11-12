@@ -21,6 +21,6 @@
   "engines": {
     "node": ">=22.12"
   },
-  "description": "Tanpura: an AI billing assistant that bills every family correctly from the class calendar, through PayPal.",
+  "description": "Tanpura: an AI billing assistant for anyone who bills by the session, with correct PayPal invoices from the calendar.",
   "license": "MIT"
 }
