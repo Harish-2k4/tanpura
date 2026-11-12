@@ -7,7 +7,7 @@ import darkThemeUrl from '@bryntum/calendar/material3-dark.css?url';
 import lightThemeUrl from '@bryntum/calendar/material3-light.css?url';
 import './calendar.css';
 import { BryntumCalendar } from '@bryntum/calendar-react';
-import ChatBubbleOutlined from '@mui/icons-material/ChatBubbleOutlined';
+import AutoAwesomeOutlined from '@mui/icons-material/AutoAwesomeOutlined';
 import Box from '@mui/material/Box';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Button from '@mui/material/Button';
@@ -101,7 +101,7 @@ function ClassCalendar({ teacher, students }: { teacher: TeacherView; students: 
         title="Calendar"
         subtitle={`${zoneCity(teacher.timezone)} time`}
         actions={
-          <Button variant="outlined" startIcon={<ChatBubbleOutlined />} onClick={() => assistant.open()}>
+          <Button variant="outlined" startIcon={<AutoAwesomeOutlined />} onClick={() => assistant.open()}>
             Paste a message
           </Button>
         }

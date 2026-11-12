@@ -1,5 +1,5 @@
 // PayPal REST client (sandbox), plain fetch, no SDK. Server-side only.
-// Adapted from PayPal's hackathon boilerplate (paypaldev/hackathon-paypal-ag-grid-boilerplate).
+// Adapted from PayPal's PayPal + AG Grid boilerplate (paypaldev on GitHub).
 import { config } from './config';
 
 const BASE_URL = 'https://api-m.sandbox.paypal.com';

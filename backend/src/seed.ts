@@ -250,7 +250,7 @@ export function generateDemoData(now = new Date(), opts: { buyerEmail?: string; 
       const isUnpaid = unpaid[month]?.includes(st.id);
       const paidOn = addDays(issued, 1 + Math.floor(rand() * 8));
       invoices.push({
-        id: `MOCK-${st.id}-${month}-1`,
+        id: `DEMO-${st.id}-${month}-1`,
         studentId: st.id,
         month,
         currency: draft.currency,

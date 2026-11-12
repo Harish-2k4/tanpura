@@ -64,7 +64,7 @@ export function ReminderDialog({ invoiceId, onClose }: { invoiceId: string; onCl
           { id: invoiceId, subject, note },
           {
             onSuccess: () => {
-              toast.success(`Reminder sent${inv?.mock ? ' (mock)' : ' through PayPal'}`);
+              toast.success(inv?.mock ? 'Reminder recorded (demo invoice, not in PayPal)' : 'Reminder sent through PayPal');
               onClose();
             },
           },

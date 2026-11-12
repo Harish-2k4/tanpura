@@ -200,7 +200,11 @@ function InvoiceTable({ rows, today }: { rows: InvoiceRow[]; today: string }) {
                   <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>{formatShortDate(inv.dueDate)}</TableCell>
                   <TableCell sx={{ display: { xs: 'none', lg: 'table-cell' }, fontFamily: 'monospace', fontSize: 13 }}>
                     {inv.id}
-                    {inv.mock && ' (mock)'}
+                    {inv.mock && (
+                      <Tooltip title="Sample history from the demo data: recorded here, not in PayPal">
+                        <Box component="span" sx={{ color: 'text.secondary' }}> (demo)</Box>
+                      </Tooltip>
+                    )}
                   </TableCell>
                   <TableCell padding="checkbox">
                     <Tooltip title={hasActions ? 'Actions' : 'No actions for this invoice'}>

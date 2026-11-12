@@ -1,6 +1,6 @@
 // The AI assistant: paste a message from a family (or describe your own day), review what
 // Tanpura proposes and what it does to the next bill, then approve. Nothing changes before that.
-import ChatBubbleOutlined from '@mui/icons-material/ChatBubbleOutlined';
+import AutoAwesomeOutlined from '@mui/icons-material/AutoAwesomeOutlined';
 import Close from '@mui/icons-material/Close';
 import Mic from '@mui/icons-material/Mic';
 import StopCircle from '@mui/icons-material/StopCircle';

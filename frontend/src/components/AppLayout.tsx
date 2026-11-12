@@ -1,4 +1,4 @@
-import ChatBubbleOutlined from '@mui/icons-material/ChatBubbleOutlined';
+import AutoAwesomeOutlined from '@mui/icons-material/AutoAwesomeOutlined';
 import CalendarMonthOutlined from '@mui/icons-material/CalendarMonthOutlined';
 import DarkModeOutlined from '@mui/icons-material/DarkModeOutlined';
 import LightModeOutlined from '@mui/icons-material/LightModeOutlined';
@@ -11,7 +11,6 @@ import AppBar from '@mui/material/AppBar';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Chip from '@mui/material/Chip';
 import IconButton from '@mui/material/IconButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Menu from '@mui/material/Menu';
@@ -45,22 +44,6 @@ export function Brand({ size = 'medium' }: { size?: 'medium' | 'large' }) {
       <Typography variant={size === 'large' ? 'h5' : 'h6'} sx={{ fontWeight: 700, color: 'text.primary', letterSpacing: '-0.01em', display: size === 'large' ? 'block' : { xs: 'none', sm: 'block' } }}>
         Tanpura
       </Typography>
-    </Stack>
-  );
-}
-
-function IntegrationChips() {
-  const { data: teacher } = useTeacher();
-  if (!teacher) return null;
-  const { paypal, ai } = teacher.integrations;
-  return (
-    <Stack direction="row" spacing={1} sx={{ display: { xs: 'none', md: 'flex' } }}>
-      <Tooltip title={paypal === 'sandbox' ? 'Invoices are created in the PayPal sandbox' : 'No PayPal keys: invoices are recorded here only'}>
-        <Chip size="small" variant="outlined" color={paypal === 'sandbox' ? 'success' : 'warning'} label={paypal === 'sandbox' ? 'PayPal sandbox' : 'PayPal mock'} />
-      </Tooltip>
-      <Tooltip title={ai === 'live' ? 'AI assistant uses Gemini' : 'No Gemini key: AI features use sample answers'}>
-        <Chip size="small" variant="outlined" color={ai === 'live' ? 'success' : 'warning'} label={ai === 'live' ? 'AI live' : 'AI mock'} />
-      </Tooltip>
     </Stack>
   );
 }
@@ -121,7 +104,7 @@ function AssistantButton() {
   const assistant = useAssistant();
   return (
     <Tooltip describeChild title={`Paste a message from a ${w.family}, or describe your day`}>
-      <Button variant="contained" aria-label="Assistant" startIcon={<ChatBubbleOutlined />} onClick={() => assistant.open()} sx={{ whiteSpace: 'nowrap', minWidth: { xs: 0, sm: 'auto' }, '.MuiButton-startIcon': { mr: { xs: 0, sm: 1 } } }}>
+      <Button variant="contained" size="small" aria-label="Assistant" startIcon={<AutoAwesomeOutlined />} onClick={() => assistant.open()} sx={{ whiteSpace: 'nowrap', minWidth: { xs: 0, sm: 'auto' }, '.MuiButton-startIcon': { mr: { xs: 0, sm: 1 } } }}>
         <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
           Assistant
         </Box>
@@ -162,7 +145,6 @@ function Shell() {
           <Box sx={{ flex: 1, minWidth: 0, display: { xs: 'none', md: 'block' } }}>{tabs}</Box>
           <Box sx={{ flex: 1, display: { xs: 'block', md: 'none' } }} />
           <Box sx={{ display: { xs: 'none', lg: 'flex' } }}>
-            <IntegrationChips />
           </Box>
           <AssistantButton />
           <ColorModeButton />

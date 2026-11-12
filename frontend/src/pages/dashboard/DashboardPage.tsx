@@ -3,7 +3,6 @@
 import EditOutlined from '@mui/icons-material/EditOutlined';
 import RestartAlt from '@mui/icons-material/RestartAlt';
 import VisibilityOutlined from '@mui/icons-material/VisibilityOutlined';
-import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import Box from '@mui/material/Box';
@@ -100,11 +99,6 @@ function Dashboard({ data, w }: { data: DashboardData; w: UiWords }) {
           </>
         }
       />
-      {!data.licenseKey && (
-        <Alert severity="info" sx={{ mb: 2 }}>
-          AG Studio runs with a trial watermark until a licence key is added (AG_STUDIO_LICENSE).
-        </Alert>
-      )}
       <Card sx={{ overflow: 'hidden' }}>
         <Tabs value={page} onChange={(_, v: string) => selectPage(v)} sx={{ px: 2, borderBottom: 1, borderColor: 'divider' }}>
           {Object.entries(pageTitles(w)).map(([id, label]) => (

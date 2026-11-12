@@ -4,8 +4,8 @@
 
 > A tanpura's steady drone keeps musicians in tune. Tanpura keeps your billing in tune.
 
-- **Live demo:** _hosted link goes here_ (Render free tier: the first load can take about a minute while it wakes up)
-- **Demo login:** shown on the sign-in page (`teacher@tanpura.app`, demo mode)
+- **Live demo:** https://tanpura.onrender.com (Render free tier: the first load can take about a minute while it wakes up)
+- **Demo login:** shown on the sign-in page (`teacher@tanpura.app`, demo mode). Every sign-in gets its own private copy of the demo data, so visitors never see each other's changes.
 - **Video (under 3 minutes):** _YouTube link goes here_
 
 ## The problem
@@ -30,7 +30,7 @@ The demo follows Lakshmi, a Carnatic music teacher in Coimbatore, India, with 20
 | **AI assistant for messages** | Paste a message from a family, or describe your own day ("I'm unwell tomorrow"). Gemini works out which classes it means, Tanpura proposes the cancellations and makeups, shows the effect on the next bill, and drafts a reply. Nothing changes until the teacher approves. |
 | **Friendly reminders** | For an overdue invoice, Gemini drafts a warm reminder from the family's payment history; the teacher edits it and PayPal sends it with the invoice link. |
 | **Live payments** | When a family pays, a PayPal webhook updates the invoice and the app shows "Priya paid US$90" straight away. |
-| **What you actually keep** | Payments received through PayPal this month, PayPal's fees and the net amount, matched to each family's invoice, with an approximate total in your own currency (e.g. ≈ ₹) at each payment date's reference rate. |
+| **What you actually keep** | Payments of your Tanpura invoices received through PayPal this month, PayPal's fees and the net amount, matched to each family's invoice, with an approximate total in your own currency (e.g. ≈ ₹) at each payment date's reference rate. |
 | **Students and enrolment** | Add or edit a student (who pays, country and time zone, rate, weekly times shown in both time zones, with overlaps refused). End an enrolment when someone stops: later classes leave the calendar, classes already paid for become a refund owed, and "Mark refunded" records it once you have refunded on PayPal. |
 | **Exports** | Invoices and payments as CSV for accounts or tax time. |
 | **Dashboard** | Billed vs collected by month, a "payment rhythm" heatmap (how fast each family pays each month), invoice states and class outcomes, plus an AI assistant (Gemini) that answers questions by building charts. |
@@ -52,6 +52,7 @@ All in the PayPal sandbox, server-side only:
 - **The AI never decides money.** Billing is plain, tested code. Whether a cancellation is late is computed from the teacher's notice rule, not by the AI. Proposed changes are simulated with the app's own rules to show the exact bill impact, then applied only after approval, all together or not at all.
 - **Family time zones:** a parent's "Saturday" means their Saturday, which can be Sunday in India.
 - **Reminders** are written from facts (amount, month, how late, past payments), kind and short, and always edited by the teacher before PayPal sends them.
+- **Guarded:** a family's message is treated as text to read, never as instructions; the dashboard assistant only works on the dashboard; and hourly and daily limits of AI calls per visitor keep the public demo from using up the key.
 - **Busy models:** if the chosen Gemini model is slow or overloaded, the request is retried and then moved to a stable Flash model; **without a key** (or if Gemini still fails), Tanpura falls back to built-in rules, so the app keeps working.
 
 ## Built with
@@ -111,7 +112,7 @@ Other scripts: `npm test` (engine, assistant and API tests, including a check th
 
 Create a Blueprint from this repo (`render.yaml`), then fill in the secret variables. The free plan's disk is temporary, so the demo data is rebuilt around the current date on each start.
 
-## Testing it as a judge
+## Try it
 
 1. Open the demo and choose **Use demo** on the sign-in page, then pick **Teaching** (the demo story) when asked what kind of work you bill for.
 2. **Billing → To send:** open a bill to see each line with its class dates and the flags that need a decision; waive a missed class and watch the total change; tick bills and **Send** them as PayPal invoices.
@@ -120,11 +121,11 @@ Create a Blueprint from this repo (`render.yaml`), then fill in the secret varia
 5. Pay the invoice sent to the sandbox buyer account (the family using `DEMO_BUYER_EMAIL`) and watch the app announce the payment; **Payments received** shows the fee and what you keep.
 6. **Students:** add a student, or end one's enrolment and see the refund on their final bill.
 7. **Calendar** and **Dashboard:** see classes in Bryntum and the payment rhythm in AG Studio.
-8. **Settings → Reset** rebuilds the demo data at any time.
+8. **Settings → Reset** rebuilds your copy of the demo data at any time.
 
 ## Credits
 
-- The PayPal REST client started from PayPal's hackathon boilerplate, [paypaldev/hackathon-paypal-ag-grid-boilerplate](https://github.com/paypaldev/hackathon-paypal-ag-grid-boilerplate).
+- The PayPal REST client started from [PayPal's PayPal + AG Grid boilerplate](https://github.com/paypaldev/hackathon-paypal-ag-grid-boilerplate).
 - Students, families and classes in the demo are made up.
 
 ## Licence

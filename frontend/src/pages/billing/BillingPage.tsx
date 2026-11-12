@@ -47,7 +47,8 @@ function Billing({ teacher }: { teacher: TeacherView }) {
   const requested = params.get('month');
   const month = requested && monthSchema.safeParse(requested).success ? requested : teacher.suggestedMonth;
   const tab = (['invoices', 'payments'] as const).find((t) => t === params.get('tab')) ?? 'bills';
-  const setParam = (key: string, value: string) => setParams((p) => (p.set(key, value), p), { replace: true });
+  // Switching tabs is a step the browser's back button undoes; changing the month just updates the link.
+  const setParam = (key: string, value: string) => setParams((p) => (p.set(key, value), p), { replace: key !== 'tab' });
   const current = teacher.today.slice(0, 7);
   const mock = teacher.integrations.paypal === 'mock';
 

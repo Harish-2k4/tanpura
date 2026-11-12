@@ -60,7 +60,7 @@ export const INVOICE_STATUSES = ['SENT', 'PAID', 'PARTIALLY_PAID', 'CANCELLED'] 
 export type InvoiceStatus = (typeof INVOICE_STATUSES)[number];
 
 export type InvoiceRecord = {
-  id: string; // PayPal invoice id (or MOCK-...)
+  id: string; // PayPal invoice id (or DEMO-... for sample history, MOCK-... without PayPal keys)
   studentId: string;
   month: string; // YYYY-MM it was issued for
   currency: Currency;
@@ -306,7 +306,7 @@ export function buildDraft({ student, sessions, invoices, teacher, month, today,
   if (missed.length) {
     flags.push({
       code: 'missed_charged',
-      message: `${first} missed ${plural(missed.length, w.class, w.classes)} without enough notice (${formatDates(missed.map(dateOf))}). Charged; waive?`,
+      message: `${first} missed ${plural(missed.length, w.class, w.classes)} without enough notice (${formatDates(missed.map(dateOf))}), so by your rules ${missed.length > 1 ? "they are" : "it is"} charged. Waive any you do not want to charge.`,
       classes: missed.map(classRef),
     });
   }
